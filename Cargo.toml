@@ -1,0 +1,6 @@
+[package]
+name = "nfa-regex"
+version = "0.1.0"
+authors = ["yodalee <lc85301@gmail.com>"]
+
+[dependencies]
