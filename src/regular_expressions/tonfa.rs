@@ -81,6 +81,33 @@ impl ToNFA for Regex {
                     &accept_state,
                     &NFARulebook::new(rules))
             },
+            Regex::Plus(ref p) => {
+                let pattern_nfa = p.to_nfa_design();
+                let start_state = Rc::new(State{});
+                let mut accept_state = pattern_nfa.accept_state();
+
+                let mut rules = pattern_nfa.rules();
+                rules.extend(accept_state.iter().map(|state| FARule::new(state, '\0', &pattern_nfa.start_state())));
+                rules.push(FARule::new(&start_state, '\0', &pattern_nfa.start_state()));
+
+                NFADesign::new(
+                    &start_state,
+                    &accept_state,
+                    &NFARulebook::new(rules))
+            },
+            Regex::Optional(ref p) => {
+                let pattern_nfa = p.to_nfa_design();
+                let start_state = Rc::new(State{});
+                let mut accept_state = pattern_nfa.accept_state();
+                accept_state.insert(start_state.clone());
+                let mut rules = pattern_nfa.rules();
+                rules.push(FARule::new(&start_state, '\0', &pattern_nfa.start_state()));
+
+                NFADesign::new(
+                    &start_state,
+                    &accept_state,
+                    &NFARulebook::new(rules))
+            },
         }
     }
 

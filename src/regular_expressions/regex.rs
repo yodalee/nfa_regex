@@ -8,6 +8,8 @@ pub enum Regex {
     Concatenate(Box<Regex>, Box<Regex>),
     Choose(Box<Regex>, Box<Regex>),
     Repeat(Box<Regex>),
+    Plus(Box<Regex>),
+    Optional(Box<Regex>),
 }
 
 impl Regex {
@@ -16,6 +18,8 @@ impl Regex {
     pub fn concatenate(l: Box<Regex>, r: Box<Regex>)-> Box<Regex> { Box::new(Regex::Concatenate(l, r)) }
     pub fn choose(l: Box<Regex>, r: Box<Regex>)-> Box<Regex> { Box::new(Regex::Choose(l, r)) }
     pub fn repeat(p: Box<Regex>)-> Box<Regex> { Box::new(Regex::Repeat(p)) }
+    pub fn plus(p: Box<Regex>)-> Box<Regex> { Box::new(Regex::Plus(p)) }
+    pub fn optional(p: Box<Regex>)-> Box<Regex> { Box::new(Regex::Optional(p)) }
 
     fn bracket(&self, outer_precedence: u32) -> String {
         if self.precedence() < outer_precedence {
@@ -30,7 +34,7 @@ impl Regex {
             Regex::Empty | Regex::Literal(_) => 3,
             Regex::Concatenate(_,_) => 1,
             Regex::Choose(_,_) => 0,
-            Regex::Repeat(_) => 2,
+            Regex::Repeat(_) | Regex::Plus(_) | Regex::Optional(_) => 2,
         }
     }
 }
@@ -43,6 +47,8 @@ impl Display for Regex {
             Regex::Concatenate(ref l, ref r) => write!(f, "{}", [l, r].iter().map(|pat| pat.bracket(self.precedence())).collect::<Vec<String>>().join("")),
             Regex::Choose(ref l, ref r) => write!(f, "{}", [l, r].iter().map(|pat| pat.bracket(self.precedence())).collect::<Vec<String>>().join("|")),
             Regex::Repeat(ref p) => write!(f, "{}*", p.bracket(self.precedence())),
+            Regex::Plus(ref p) => write!(f, "{}+", p.bracket(self.precedence())),
+            Regex::Optional(ref p) => write!(f, "{}?", p.bracket(self.precedence())),
         }
     }
 }

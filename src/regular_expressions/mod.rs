@@ -52,8 +52,29 @@ mod tests {
     fn test_regex_repeat() {
         let pattern = Regex::repeat(Regex::literal('a'));
         println!("Regex '{}'", pattern);
+        assert!(pattern.matches(""));
         assert!(pattern.matches("a"));
         assert!(pattern.matches("aaaa"));
+        assert!(!pattern.matches("b"));
+    }
+
+    #[test]
+    fn test_regex_plus() {
+        let pattern = Regex::plus(Regex::literal('a'));
+        println!("Regex '{}'", pattern);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(pattern.matches("aaaa"));
+        assert!(!pattern.matches("b"));
+    }
+
+    #[test]
+    fn test_regex_optional() {
+        let pattern = Regex::optional(Regex::literal('a'));
+        println!("Regex '{}'", pattern);
+        assert!(pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(!pattern.matches("aaaa"));
         assert!(!pattern.matches("b"));
     }
 
