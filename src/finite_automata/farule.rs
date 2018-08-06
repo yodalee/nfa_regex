@@ -5,21 +5,30 @@ use std::fmt::Result;
 #[derive(Debug,Clone)]
 pub struct FARule<T> {
     pub state: T,
-    pub character: char,
     pub next_state: T,
+    kind: FARuleType
+}
+
+#[derive(Debug,Clone)]
+enum FARuleType {
+    RuleChar { character: char }
 }
 
 impl<T: Eq + PartialEq + Clone> FARule<T> {
-    pub fn new(state: &T, character: char, next_state: &T) -> Self {
+    pub fn new_rulechar(state: &T, character: char, next_state: &T) -> Self {
         FARule {
             state: state.clone(),
-            character: character,
-            next_state: next_state.clone()
+            next_state: next_state.clone(),
+            kind: FARuleType::RuleChar {
+                character: character
+            }
         }
     }
 
-    pub fn applies_to(&self, state: &T, character: char) -> bool {
-        self.state == *state && self.character == character
+    pub fn applies_to(&self, state: &T, c: char) -> bool {
+        self.state == *state && match self.kind {
+            FARuleType::RuleChar { character } => character == c
+        }
     }
 
     pub fn follow(&self) -> T {
@@ -29,6 +38,9 @@ impl<T: Eq + PartialEq + Clone> FARule<T> {
 
 impl<T: Display> Display for FARule<T> {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "FARule {} --{}--> {}", self.state, self.character, self.next_state)
+        let describe = match self.kind {
+            FARuleType::RuleChar { character } => character,
+        };
+        write!(f, "FARule {} --{}--> {}", self.state, describe, self.next_state)
     }
 }

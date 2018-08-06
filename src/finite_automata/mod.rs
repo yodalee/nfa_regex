@@ -21,9 +21,9 @@ mod tests {
     fn test_dfa_rulebook() {
         let rulebook = DFARulebook::new(
             vec![
-                FARule::new(&1, 'a', &2), FARule::new(&1, 'b', &1),
-                FARule::new(&2, 'a', &2), FARule::new(&2, 'b', &3),
-                FARule::new(&3, 'a', &3), FARule::new(&3, 'b', &3)
+                FARule::new_rulechar(&1, 'a', &2), FARule::new_rulechar(&1, 'b', &1),
+                FARule::new_rulechar(&2, 'a', &2), FARule::new_rulechar(&2, 'b', &3),
+                FARule::new_rulechar(&3, 'a', &3), FARule::new_rulechar(&3, 'b', &3)
             ]);
         assert_eq!(2, rulebook.next_state(&1, 'a'));
         assert_eq!(1, rulebook.next_state(&1, 'b'));
@@ -34,9 +34,9 @@ mod tests {
     fn test_dfa() {
         let rulebook = DFARulebook::new(
             vec![
-                FARule::new(&1, 'a', &2), FARule::new(&1, 'b', &1),
-                FARule::new(&2, 'a', &2), FARule::new(&2, 'b', &3),
-                FARule::new(&3, 'a', &3), FARule::new(&3, 'b', &3)
+                FARule::new_rulechar(&1, 'a', &2), FARule::new_rulechar(&1, 'b', &1),
+                FARule::new_rulechar(&2, 'a', &2), FARule::new_rulechar(&2, 'b', &3),
+                FARule::new_rulechar(&3, 'a', &3), FARule::new_rulechar(&3, 'b', &3)
             ]);
         assert!(DFA::new(1, &vec![1, 3], &rulebook).accepting());
         assert!(!DFA::new(1, &vec![3], &rulebook).accepting());
@@ -65,9 +65,9 @@ mod tests {
     fn test_dfa_design() {
         let rulebook = DFARulebook::new(
             vec![
-                FARule::new(&1, 'a', &2), FARule::new(&1, 'b', &1),
-                FARule::new(&2, 'a', &2), FARule::new(&2, 'b', &3),
-                FARule::new(&3, 'a', &3), FARule::new(&3, 'b', &3)
+                FARule::new_rulechar(&1, 'a', &2), FARule::new_rulechar(&1, 'b', &1),
+                FARule::new_rulechar(&2, 'a', &2), FARule::new_rulechar(&2, 'b', &3),
+                FARule::new_rulechar(&3, 'a', &3), FARule::new_rulechar(&3, 'b', &3)
             ]);
         let dfa_design = DFADesign::new(1, &vec![3], &rulebook);
         assert!(!dfa_design.accept("a"));
@@ -78,10 +78,10 @@ mod tests {
     #[test]
     fn test_nfa_rulebook() {
         let rulebook = NFARulebook::new(
-            vec![FARule::new(&1, 'a', &1), FARule::new(&1, 'b', &1),
-                 FARule::new(&1, 'b', &2), FARule::new(&2, 'a', &3),
-                 FARule::new(&2, 'b', &3), FARule::new(&3, 'a', &4),
-                 FARule::new(&3, 'b', &4)
+            vec![FARule::new_rulechar(&1, 'a', &1), FARule::new_rulechar(&1, 'b', &1),
+                 FARule::new_rulechar(&1, 'b', &2), FARule::new_rulechar(&2, 'a', &3),
+                 FARule::new_rulechar(&2, 'b', &3), FARule::new_rulechar(&3, 'a', &4),
+                 FARule::new_rulechar(&3, 'b', &4)
             ]);
         let result1 = rulebook.next_states(&to_hashset(&[1]), 'b');
         let ans1 = to_hashset(&[1,2]);
@@ -97,10 +97,10 @@ mod tests {
     #[test]
     fn test_nfa() {
         let rulebook = NFARulebook::new(
-            vec![FARule::new(&1, 'a', &1), FARule::new(&1, 'b', &1),
-                 FARule::new(&1, 'b', &2), FARule::new(&2, 'a', &3),
-                 FARule::new(&2, 'b', &3), FARule::new(&3, 'a', &4),
-                 FARule::new(&3, 'b', &4)
+            vec![FARule::new_rulechar(&1, 'a', &1), FARule::new_rulechar(&1, 'b', &1),
+                 FARule::new_rulechar(&1, 'b', &2), FARule::new_rulechar(&2, 'a', &3),
+                 FARule::new_rulechar(&2, 'b', &3), FARule::new_rulechar(&3, 'a', &4),
+                 FARule::new_rulechar(&3, 'b', &4)
             ]);
 
         assert!(!NFA::new(&to_hashset(&[1]), &to_hashset(&[4]), &rulebook).accepting());
@@ -124,10 +124,10 @@ mod tests {
     #[test]
     fn test_nfadesign() {
         let rulebook = NFARulebook::new(
-            vec![FARule::new(&1, 'a', &1), FARule::new(&1, 'b', &1),
-                 FARule::new(&1, 'b', &2), FARule::new(&2, 'a', &3),
-                 FARule::new(&2, 'b', &3), FARule::new(&3, 'a', &4),
-                 FARule::new(&3, 'b', &4)
+            vec![FARule::new_rulechar(&1, 'a', &1), FARule::new_rulechar(&1, 'b', &1),
+                 FARule::new_rulechar(&1, 'b', &2), FARule::new_rulechar(&2, 'a', &3),
+                 FARule::new_rulechar(&2, 'b', &3), FARule::new_rulechar(&3, 'a', &4),
+                 FARule::new_rulechar(&3, 'b', &4)
             ]);
 
         let nfa_design = NFADesign::new(&1, &to_hashset(&[4]), &rulebook);
@@ -139,10 +139,10 @@ mod tests {
     #[test]
     fn test_nfa_freemove() {
         let rulebook = NFARulebook::new(
-            vec![FARule::new(&1, '\0',&2), FARule::new(&1, '\0', &4),
-                 FARule::new(&2, 'a', &3), FARule::new(&3, 'a', &2),
-                 FARule::new(&4, 'a', &5), FARule::new(&5, 'a', &6),
-                 FARule::new(&6, 'a', &4)]);
+            vec![FARule::new_rulechar(&1, '\0',&2), FARule::new_rulechar(&1, '\0', &4),
+                 FARule::new_rulechar(&2, 'a', &3), FARule::new_rulechar(&3, 'a', &2),
+                 FARule::new_rulechar(&4, 'a', &5), FARule::new_rulechar(&5, 'a', &6),
+                 FARule::new_rulechar(&6, 'a', &4)]);
         let result1 = rulebook.next_states(&to_hashset(&[1]), '\0');
         let ans1 = to_hashset(&[2,4]);
         let result2 = rulebook.follow_free_moves(&to_hashset(&[1]));
