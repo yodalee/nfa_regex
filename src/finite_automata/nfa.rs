@@ -27,7 +27,7 @@ impl<T: Eq + Clone + Hash> NFA<T> {
     }
 
     pub fn read_character(&mut self, character: char) {
-        self.current_state = self.rulebook.next_states(&self.current_state(), character);
+        self.current_state = self.rulebook.next_states(&self.current_state(), Some(character));
     }
 
     pub fn read_string(&mut self, s: &str) {

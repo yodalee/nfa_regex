@@ -83,11 +83,11 @@ mod tests {
                  FARule::new_rulechar(&2, 'b', &3), FARule::new_rulechar(&3, 'a', &4),
                  FARule::new_rulechar(&3, 'b', &4)
             ]);
-        let result1 = rulebook.next_states(&to_hashset(&[1]), 'b');
+        let result1 = rulebook.next_states(&to_hashset(&[1]), Some('b'));
         let ans1 = to_hashset(&[1,2]);
-        let result2 = rulebook.next_states(&to_hashset(&[1,2]), 'a');
+        let result2 = rulebook.next_states(&to_hashset(&[1,2]), Some('a'));
         let ans2 = to_hashset(&[1,3]);
-        let result3 = rulebook.next_states(&to_hashset(&[1,3]), 'b');
+        let result3 = rulebook.next_states(&to_hashset(&[1,3]), Some('b'));
         let ans3 = to_hashset(&[1,2,4]);
         assert!(hashset_eq(&result1, &ans1));
         assert!(hashset_eq(&result2, &ans2));
@@ -139,11 +139,11 @@ mod tests {
     #[test]
     fn test_nfa_freemove() {
         let rulebook = NFARulebook::new(
-            vec![FARule::new_rulechar(&1, '\0',&2), FARule::new_rulechar(&1, '\0', &4),
+            vec![FARule::new_rulefree(&1, &2), FARule::new_rulefree(&1, &4),
                  FARule::new_rulechar(&2, 'a', &3), FARule::new_rulechar(&3, 'a', &2),
                  FARule::new_rulechar(&4, 'a', &5), FARule::new_rulechar(&5, 'a', &6),
                  FARule::new_rulechar(&6, 'a', &4)]);
-        let result1 = rulebook.next_states(&to_hashset(&[1]), '\0');
+        let result1 = rulebook.next_states(&to_hashset(&[1]), None);
         let ans1 = to_hashset(&[2,4]);
         let result2 = rulebook.follow_free_moves(&to_hashset(&[1]));
         let ans2 = to_hashset(&[1,2,4]);

@@ -13,7 +13,7 @@ impl<T: Eq + Clone + Hash> NFARulebook<T> {
         NFARulebook{rules: rules}
     }
 
-    pub fn next_states(&self, states: &HashSet<T>, character: char) -> HashSet<T> {
+    pub fn next_states(&self, states: &HashSet<T>, character: Option<char>) -> HashSet<T> {
         let mut next_states: HashSet<T> = HashSet::new();
         for state in states.iter() {
             for next_state in self.follow_rules_for(state, character) {
@@ -23,7 +23,7 @@ impl<T: Eq + Clone + Hash> NFARulebook<T> {
         next_states
     }
 
-    pub fn follow_rules_for(&self, state: &T, character: char) -> Vec<T> {
+    pub fn follow_rules_for(&self, state: &T, character: Option<char>) -> Vec<T> {
         self.rules.iter()
                   .filter(|rule| rule.applies_to(state, character))
                   .map(|rule| rule.follow())
@@ -31,7 +31,7 @@ impl<T: Eq + Clone + Hash> NFARulebook<T> {
     }
 
     pub fn follow_free_moves(&self, states: &HashSet<T>) -> HashSet<T>{
-        let more_states = self.next_states(states, '\0');
+        let more_states = self.next_states(states, None);
         if more_states.is_subset(states) {
             states.clone()
         } else {

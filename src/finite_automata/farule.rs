@@ -9,9 +9,10 @@ pub struct FARule<T> {
     kind: FARuleType
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,PartialEq)]
 enum FARuleType {
-    RuleChar { character: char }
+    RuleChar { character: char },
+    RuleFree,
 }
 
 impl<T: Eq + PartialEq + Clone> FARule<T> {
@@ -25,9 +26,21 @@ impl<T: Eq + PartialEq + Clone> FARule<T> {
         }
     }
 
-    pub fn applies_to(&self, state: &T, c: char) -> bool {
-        self.state == *state && match self.kind {
-            FARuleType::RuleChar { character } => character == c
+    pub fn new_rulefree(state: &T, next_state: &T) -> Self {
+        FARule {
+            state: state.clone(),
+            next_state: next_state.clone(),
+            kind: FARuleType::RuleFree
+        }
+    }
+
+    pub fn applies_to(&self, state: &T, c: Option<char>) -> bool {
+        self.state == *state && match c {
+            Some(c) => match self.kind {
+                FARuleType::RuleChar { character } => character == c,
+                FARuleType::RuleFree => false,
+            }
+            None => self.kind == FARuleType::RuleFree
         }
     }
 
@@ -39,7 +52,8 @@ impl<T: Eq + PartialEq + Clone> FARule<T> {
 impl<T: Display> Display for FARule<T> {
     fn fmt(&self, f: &mut Formatter) -> Result {
         let describe = match self.kind {
-            FARuleType::RuleChar { character } => character,
+            FARuleType::RuleChar { character } => character.to_string(),
+            FARuleType::RuleFree => "free".to_string(),
         };
         write!(f, "FARule {} --{}--> {}", self.state, describe, self.next_state)
     }

@@ -18,6 +18,6 @@ impl<T: Eq + Clone> DFARulebook<T> {
     }
 
     pub fn rule_for(&self, state: &T, character: char) -> Option<&FARule<T>> {
-        self.rules.iter().find(|x| x.applies_to(state, character))
+        self.rules.iter().find(|x| x.applies_to(state, Some(character)))
     }
 }
