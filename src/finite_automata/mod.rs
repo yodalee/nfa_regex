@@ -156,4 +156,15 @@ mod tests {
         assert!(!nfa_design.accept("aaaaa"));
         assert!(nfa_design.accept("aaaaaa"));
     }
+
+    #[test]
+    fn test_rule_any() {
+        let rulebook = DFARulebook::new(
+            vec![FARule::new_ruleany(&1, &2)]
+        );
+        let dfa_design = DFADesign::new(1, &vec![2], &rulebook);
+        assert!(dfa_design.accept("a"));
+        assert!(dfa_design.accept("z"));
+        assert!(dfa_design.accept("猛"));
+    }
 }

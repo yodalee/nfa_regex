@@ -31,6 +31,15 @@ mod tests {
     }
 
     #[test]
+    fn test_regex_any() {
+        let pattern = Regex::any();
+        println!("Regex '{}'", pattern);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(pattern.matches("潮"));
+    }
+
+    #[test]
     fn test_regex_concatenate() {
         let pattern = Regex::concatenate(Regex::literal('a'), Regex::literal('b'));
         println!("Regex '{}'", pattern);
@@ -89,5 +98,13 @@ mod tests {
         assert!(pattern.matches("abab"));
         assert!(pattern.matches("abaab"));
         assert!(!pattern.matches("abba"));
+    }
+
+    #[test]
+    fn test_regex_complex_repeat() {
+        let pattern = Regex::repeat(Regex::any()); // match anything
+        println!("Regex '{}'", pattern);
+        assert!(pattern.matches(""));
+        assert!(pattern.matches("枯籐老樹昏鴉小橋流水人家古道西風瘦馬夕陽西下斷腸人卻在燈火闌珊處"));
     }
 }

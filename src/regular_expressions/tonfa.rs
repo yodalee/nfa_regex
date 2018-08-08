@@ -31,10 +31,19 @@ impl ToNFA for Regex {
                 NFADesign::new(
                     &start_state,
                     &to_hashset(&[accept_state]),
-                    &NFARulebook::new(
-                        vec![rule]),
+                    &NFARulebook::new(vec![rule]),
                 )
             },
+            Regex::Any => {
+                let start_state = Rc::new(State{});
+                let accept_state = Rc::new(State{});
+                let rule = FARule::new_ruleany(&start_state, &accept_state);
+                NFADesign::new(
+                    &start_state,
+                    &to_hashset(&[accept_state]),
+                    &NFARulebook::new(vec![rule]),
+                )
+            }
             Regex::Concatenate(ref l, ref r) => {
                 let first = l.to_nfa_design();
                 let second = r.to_nfa_design();
