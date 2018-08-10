@@ -4,3 +4,9 @@ version = "0.1.0"
 authors = ["yodalee <lc85301@gmail.com>"]
 
 [dependencies]
+pest = "^1.0"
+pest_derive = "^1.0"
+
+[[bin]]
+name = "regex_parser"
+path = "src/regex-parser.rs"

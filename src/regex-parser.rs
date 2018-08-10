@@ -1,10 +1,10 @@
-extern crate computationbook;
+extern crate nfa_regex;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
-use computationbook::the_simplest_computers::regular_expressions::regex::{Regex};
-use computationbook::the_simplest_computers::regular_expressions::tonfa::{ToNFA};
+use nfa_regex::regular_expressions::regex::{Regex};
+use nfa_regex::regular_expressions::tonfa::{ToNFA};
 use pest::Parser;
 use pest::iterators::{Pair};
 use std::env;
@@ -13,7 +13,7 @@ use std::env;
 const _GRAMMER: &'static str = include_str!("regex.pest");
 
 #[derive(Parser)]
-#[grammar = "the_simplest_computers/regex.pest"]
+#[grammar = "regex.pest"]
 struct RegexParser;
 
 pub fn main() {
