@@ -9,6 +9,7 @@ pub mod nfadesign;
 
 #[cfg(test)]
 mod tests {
+    use super::faruledata::*;
     use super::farule::*;
     use super::dfarulebook::*;
     use super::dfa::*;
@@ -167,5 +168,29 @@ mod tests {
         assert!(dfa_design.accept("a"));
         assert!(dfa_design.accept("z"));
         assert!(dfa_design.accept("猛"));
+    }
+
+    #[test]
+    fn test_rule_set() {
+        let range = vec![FARuleData::range('a', 'z')];
+        let rulebook = NFARulebook::new(
+            vec![FARule::new_ruleset(&1, &2, &range, false)]
+        );
+        let nfa_design = NFADesign::new(&1, &to_hashset(&[2]), &rulebook);
+        assert!(nfa_design.accept("x"));
+        assert!(nfa_design.accept("j"));
+        assert!(!nfa_design.accept("猛"));
+    }
+
+    #[test]
+    fn test_rule_set_reverse() {
+        let range = vec![FARuleData::range('a', 'z')];
+        let rulebook = NFARulebook::new(
+            vec![FARule::new_ruleset(&1, &2, &range, true)]
+        );
+        let nfa_design = NFADesign::new(&1, &to_hashset(&[2]), &rulebook);
+        assert!(!nfa_design.accept("x"));
+        assert!(!nfa_design.accept("j"));
+        assert!(nfa_design.accept("猛"));
     }
 }
