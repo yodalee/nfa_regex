@@ -1,3 +1,4 @@
+mod faruledata;
 pub mod farule;
 pub mod dfarulebook;
 pub mod dfa;
