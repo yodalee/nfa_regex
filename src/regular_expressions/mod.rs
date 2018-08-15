@@ -4,6 +4,7 @@ mod state;
 
 #[cfg(test)]
 mod tests {
+    use finite_automata::faruledata::{FARuleData};
     use super::regex::*;
     use super::tonfa::*;
 
@@ -29,6 +30,29 @@ mod tests {
         assert!(pattern.matches("a"));
         assert!(!pattern.matches("b"));
     }
+
+    #[test]
+    fn test_regex_set() {
+        let range = vec![FARuleData::range('a', 'z')];
+        let pattern = Regex::set(&range, false);
+        println!("Regex '{}'", pattern);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(pattern.matches("x"));
+        assert!(!pattern.matches("1"));
+    }
+
+    #[test]
+    fn test_regex_reverse_set() {
+        let range = vec![FARuleData::range('A', 'Z')];
+        let pattern = Regex::set(&range, false);
+        println!("Regex '{}'", pattern);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("E"));
+        assert!(pattern.matches("Q"));
+        assert!(!pattern.matches("a"));
+    }
+
 
     #[test]
     fn test_regex_any() {

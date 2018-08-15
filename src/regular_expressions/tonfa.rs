@@ -34,6 +34,16 @@ impl ToNFA for Regex {
                     &NFARulebook::new(vec![rule]),
                 )
             },
+            Regex::Set(ref set, reverse) => {
+                let start_state = Rc::new(State{});
+                let accept_state = Rc::new(State{});
+                let rule = FARule::new_ruleset(&start_state, &accept_state, set, reverse);
+                NFADesign::new(
+                    &start_state,
+                    &to_hashset(&[accept_state]),
+                    &NFARulebook::new(vec![rule]),
+                )
+            }
             Regex::Any => {
                 let start_state = Rc::new(State{});
                 let accept_state = Rc::new(State{});
