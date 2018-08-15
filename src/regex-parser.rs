@@ -37,13 +37,18 @@ pub fn main() {
 fn build_regex(pair: Pair<Rule>) -> Box<Regex> {
     match pair.as_rule() {
         Rule::empty => Regex::empty(),
-        Rule::alpha => Regex::literal(pair
+        Rule::character => Regex::literal(pair
             .into_span().as_str().chars().next().unwrap()),
         Rule::repeat => {
             let mut inner = pair.into_inner();
             let regex = build_regex(inner.next().unwrap());
             match inner.next() {
-                Some(_) => Regex::repeat(regex),
+                Some(pair) => match pair.as_rule() {
+                    Rule::op_repeat => Regex::repeat(regex),
+                    Rule::op_plus => Regex::plus(regex),
+                    Rule::op_optional => Regex::optional(regex),
+                    _ => unreachable!("Unexpected rule: {}", pair),
+                }
                 None => regex,
             }
         },
@@ -65,7 +70,7 @@ fn build_regex(pair: Pair<Rule>) -> Box<Regex> {
                 None => fst,
             }
         },
-        _ => unreachable!(),
+        _ => unreachable!("Unexpected rule: {}", pair),
     }
 }
 
@@ -103,6 +108,29 @@ mod tests {
         assert!(pattern.matches("a"));
         assert!(!pattern.matches("b"));
         assert!(pattern.matches("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+
+    #[test]
+    fn test_regexparser_plus() {
+        let pair = RegexParser::parse(Rule::choose, "a*")
+                    .unwrap_or_else(|e| panic!("{}", e))
+                    .next().unwrap();
+        let pattern = build_regex(pair);
+        assert!(pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(!pattern.matches("b"));
+        assert!(pattern.matches("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+    #[test]
+    fn test_regexparser_optional() {
+        let pair = RegexParser::parse(Rule::choose, "a?")
+                    .unwrap_or_else(|e| panic!("{}", e))
+                    .next().unwrap();
+        let pattern = build_regex(pair);
+        assert!(pattern.matches(""));
+        assert!(pattern.matches("a"));
+        assert!(!pattern.matches("b"));
+        assert!(!pattern.matches("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
     }
 
     #[test]

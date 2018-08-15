@@ -1,19 +1,23 @@
-alpha = { 'a'..'z' | 'A'..'Z' }
+character = { 'a'..'z' | 'A'..'Z' | '0'..'9' }
 
 whitespace = _{ " " | "\n" }
 
-choose = { concat_or_empty ~ "|" ~ choose | concat_or_empty }
-
-concat_or_empty = _{ concat | empty }
-
-concat = { repeat ~ concat | repeat }
+brackets = _{ "(" ~ choose ~ ")" | character }
 
 empty = { "" }
 
 op_repeat = { "*" }
-repeat = { brackets ~ op_repeat | brackets }
+op_plus = { "+" }
+op_optional = { "?" }
+repeat_suffix = _{ op_repeat | op_plus | op_optional }
 
-brackets = _{ "(" ~ choose ~ ")" | alpha }
+repeat = { brackets ~ repeat_suffix | brackets }
+
+concat = { repeat ~ concat | repeat }
+
+concat_or_empty = _{ concat | empty }
+
+choose = { concat_or_empty ~ "|" ~ choose | concat_or_empty }
 
 regex = _{ soi ~ choose ~ eoi }
 
