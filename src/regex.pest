@@ -2,7 +2,16 @@ character = { 'a'..'z' | 'A'..'Z' | '0'..'9' }
 
 whitespace = _{ " " | "\n" }
 
-brackets = _{ "(" ~ choose ~ ")" | character }
+range = { character ~ "-" ~ character }
+
+set = { (range | character)+ }
+
+op_not = { "^" }
+
+reverse_set = { op_not? ~ set }
+
+brackets = _{ "(" ~ choose ~ ")" |
+  "[" ~ reverse_set ~ "]" | character }
 
 empty = { "" }
 

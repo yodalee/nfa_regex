@@ -3,6 +3,7 @@ extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
+use nfa_regex::finite_automata::faruledata::{FARuleData};
 use nfa_regex::regular_expressions::regex::{Regex};
 use nfa_regex::regular_expressions::tonfa::{ToNFA};
 use pest::Parser;
@@ -34,11 +35,43 @@ pub fn main() {
     }
 }
 
+fn build_set(pair: Pair<Rule>, reverse: bool) -> Box<Regex> {
+    let mut set = Vec::new();
+    let inner = pair.into_inner();
+    for pair in inner {
+        println!("rule: {:?}", pair.as_rule());
+        set.push(match pair.as_rule() {
+            Rule::range => {
+                let mut inner = pair.into_inner();
+                let start = inner.next().unwrap().into_span().as_str().chars().next().unwrap();
+                let end = inner.next().unwrap().into_span().as_str().chars().next().unwrap();
+                FARuleData::range(start, end)
+            }
+            Rule::character => {
+                let c = pair.into_span().as_str().chars().next().unwrap();
+                FARuleData::char(c)
+            }
+            _ => unreachable!("Unexpected rule: {}", pair),
+        })
+    }
+    Regex::set(&set, reverse)
+}
+
 fn build_regex(pair: Pair<Rule>) -> Box<Regex> {
+    println!("rule: {:?}", pair.as_rule());
     match pair.as_rule() {
         Rule::empty => Regex::empty(),
         Rule::character => Regex::literal(pair
             .into_span().as_str().chars().next().unwrap()),
+        Rule::reverse_set => {
+            let mut inner = pair.into_inner();
+            let may_op = inner.next().unwrap();
+            if may_op.as_rule() == Rule::op_not {
+                build_set(inner.next().unwrap(), true)
+            } else {
+                build_set(may_op, false)
+            }
+        }
         Rule::repeat => {
             let mut inner = pair.into_inner();
             let regex = build_regex(inner.next().unwrap());
@@ -47,7 +80,7 @@ fn build_regex(pair: Pair<Rule>) -> Box<Regex> {
                     Rule::op_repeat => Regex::repeat(regex),
                     Rule::op_plus => Regex::plus(regex),
                     Rule::op_optional => Regex::optional(regex),
-                    _ => unreachable!("Unexpected rule: {}", pair),
+                    _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
                 }
                 None => regex,
             }
@@ -96,6 +129,45 @@ mod tests {
         let pattern = build_regex(pair);
         assert!(!pattern.matches(""));
         assert!(pattern.matches("a"));
+    }
+
+    #[test]
+    fn test_regexparser_set_char() {
+        let pair = RegexParser::parse(Rule::choose, "[aeiouAEIOU]")
+                    .unwrap_or_else(|e| panic!("{}", e))
+                    .next().unwrap();
+        let pattern = build_regex(pair);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("e"));
+        assert!(!pattern.matches("r"));
+        assert!(!pattern.matches("AB"));
+    }
+
+    #[test]
+    fn test_regexparser_set_range() {
+        let pair = RegexParser::parse(Rule::choose, "[a-z]")
+                    .unwrap_or_else(|e| panic!("{}", e))
+                    .next().unwrap();
+        let pattern = build_regex(pair);
+        assert!(!pattern.matches(""));
+        assert!(pattern.matches("e"));
+        assert!(pattern.matches("r"));
+        assert!(!pattern.matches("A"));
+        assert!(!pattern.matches("ww"));
+    }
+
+    #[test]
+    fn test_regexparser_set_reverse() {
+        let pair = RegexParser::parse(Rule::choose, "[^a-z]")
+                    .unwrap_or_else(|e| panic!("{}", e))
+                    .next().unwrap();
+        let pattern = build_regex(pair);
+        assert!(!pattern.matches(""));
+        assert!(!pattern.matches("e"));
+        assert!(!pattern.matches("r"));
+        assert!(pattern.matches("A"));
+        assert!(pattern.matches("1"));
+        assert!(!pattern.matches("ww"));
     }
 
     #[test]
